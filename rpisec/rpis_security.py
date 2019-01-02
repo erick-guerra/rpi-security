@@ -38,6 +38,7 @@ class RpisSecurity(object):
         'camera_mode': 'gif',
         'camera_capture_length': '3',
         'telegram_users_number': '1'
+        'arp_ping_count': '5',
     }
 
     def __init__(self, config_file, data_file):
@@ -69,7 +70,7 @@ class RpisSecurity(object):
             logger.debug('Data file read: {0}'.format(self.data_file))
         return result
 
-    def arp_ping_macs(self, repeat=4):
+    def arp_ping_macs(self):
         """
         Performs an ARP scan of a destination MAC address to try and determine if they are present on the network.
         """
@@ -84,6 +85,9 @@ class RpisSecurity(object):
                         result.append(str(reply[1].psrc))
                         result = ', '.join(result)
             return result
+
+        repeat = self.arp_ping_count
+        
         while repeat > 0:
             for mac_address in self.mac_addresses:
                 result = _arp_ping(mac_address)
@@ -136,6 +140,7 @@ class RpisSecurity(object):
         self.packet_timeout = int(self.packet_timeout)
         self.mac_addresses = self.mac_addresses.lower().split(',')
         self.telegram_users_number = int(self.telegram_users_number)
+        self.arp_ping_count = int(self.arp_ping_count)
 
     def _check_system(self):
         if not os.geteuid() == 0:
